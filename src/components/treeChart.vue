@@ -4,11 +4,11 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-23 17:28:41
+ * @LastEditTime: 2023-04-24 14:59:05
 -->
 <template>
   <div class="treeCharts">
-    <div id="chart" :style="{ width: '100vw', height: '500px' }"></div>
+    <div id="chart" :style="{ width: '100vw', height: '600px' }"></div>
     <!-- 是否展示为圆 -->
     <div class="box">
       <div class="switch">
@@ -16,6 +16,10 @@
         <el-input placeholder="请输入" v-model="colorName" style="font-size: 13px" size="small" @keydown.enter.native="queryData">
           <i slot="suffix" class="el-icon-search" @click="queryData"></i>
         </el-input>
+      </div>
+      <div class="switch">
+        <span>字体大小：</span>
+        <el-input-number v-model="fontSize" :step="1" :min="8" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
         <span>是否展示为圆：</span>
@@ -30,6 +34,10 @@
       <div class="switch">
         <span>线条颜色：</span>
         <el-color-picker v-model="lineColor"></el-color-picker>
+      </div>
+      <div class="switch">
+        <span>高亮颜色：</span>
+        <el-color-picker v-model="eColor"></el-color-picker>
       </div>
       <div class="switch">
         <span>文字颜色：</span>
@@ -47,8 +55,11 @@ export default {
   data() {
     return {
       colorName: '',
+      fontSize: 9,
       lineColor: '#fff',
       fontColor: '#fff',
+      eColor: '#42cccc',
+      currentDataIndexs: [], // 高亮节点index
       status: false,
       firstLevelList: [], // 第一层级列表
       secondLevelList: [], // 第二层级列表
@@ -69,6 +80,11 @@ export default {
             lineStyle: {
               color: '#fff',
             },
+            emphasis: {
+              lineStyle: {
+                color: '#42cccc',
+              },
+            },
             top: '8%',
             bottom: '20%',
             symbol: 'emptyCircle',
@@ -76,7 +92,7 @@ export default {
             expandAndCollapse: true,
             label: {
               position: 'top',
-              rotate: -90,
+              rotate: 0,
               verticalAlign: 'middle',
               align: 'right',
               fontSize: 9,
@@ -98,16 +114,47 @@ export default {
   },
   methods: {
     queryData() {
+      this.curstomDom.dispatchAction({
+        type: 'downplay',
+        dataIndex: this.currentDataIndexs,
+      });
       if (!this.colorName) return;
-      console.log(this.colorName);
+      let data = this.findPath(this.colorName, this.firstLevelList);
+      if (data && data.length > 0) {
+        let arr = data.map((item) => item.index);
+        this.currentDataIndexs = [0, ...arr];
+        // 高亮点击已保存的相关节点的连线，防止上一步取消了已保存节点的高亮
+        this.curstomDom.dispatchAction({
+          type: 'highlight',
+          dataIndex: this.currentDataIndexs,
+        });
+      }
+    },
+    findPath(targetValue, tree, path = []) {
+      if (tree.name === targetValue) {
+        return path.concat([tree]);
+      }
+      if (tree.children) {
+        for (let i = 0; i < tree.children.length; i++) {
+          const child = tree.children[i];
+          const result = this.findPath(targetValue, child, path.concat([tree]));
+          if (result) {
+            return result;
+          }
+        }
+      }
+      return null;
     },
     getBarParams() {
-      this.option.series[0].data = this.firstLevelList;
+      this.option.series[0].data = [this.firstLevelList];
       this.renderBar();
     },
     //渲染
     renderBar() {
       this.curstomDom.setOption(this.option); //设置配置项
+      this.$nextTick(() => {
+        this.initOtherEvent();
+      });
     },
     parseCsvData(url, key) {
       let that = this;
@@ -121,17 +168,70 @@ export default {
       });
     },
     levelListHandel() {
+      let index = 1;
       this.firstLevelList.forEach((item) => {
+        index += 1;
+        item.index = index;
         item.name = item.color;
         item.children = [];
         this.secondLevelList.forEach((val) => {
           val.name = val.color;
           if (val.parent == item.color) {
+            index += 1;
+            val.index = index;
             item.children.push(val);
           }
         });
       });
+      this.firstLevelList = {
+        index: 1,
+        name: '中国传统色',
+        children: this.firstLevelList,
+      };
       this.getBarParams();
+    },
+    initOtherEvent() {
+      let that = this;
+      this.curstomDom.on('click', function (params) {
+        // 先取消已高亮的节点连线
+        that.curstomDom.dispatchAction({
+          type: 'downplay',
+          dataIndex: that.currentDataIndexs,
+        });
+
+        // 针对非最尾节点点击收缩展开后已高亮线路失效
+        if (params.data.children) {
+          that.curstomDom.dispatchAction({
+            type: 'highlight',
+            dataIndex: that.currentDataIndexs,
+          });
+          return;
+        }
+
+        const treeAncestors = params.treeAncestors;
+        const dataIndexs = treeAncestors.map((item) => item.dataIndex);
+        // 重新保存当前高亮的节点
+        that.currentDataIndexs = dataIndexs;
+        // 高亮相关节点连线
+        that.curstomDom.dispatchAction({
+          type: 'highlight',
+          dataIndex: dataIndexs,
+        });
+      });
+      // 节点鼠标移入事件
+      this.curstomDom.on('mouseover', function (params) {
+        // 取消当前节点的高点，顶替默认事件
+        that.curstomDom.dispatchAction({
+          type: 'downplay',
+          dataIndex: params.dataIndex,
+        });
+
+        // 高亮点击已保存的相关节点的连线，防止上一步取消了已保存节点的高亮
+        that.curstomDom.dispatchAction({
+          type: 'highlight',
+          dataIndex: that.currentDataIndexs,
+        });
+      });
     },
     //改变chart大小
     changeChartSize() {
@@ -173,6 +273,18 @@ export default {
     fontColor: function (val) {
       this.$nextTick(() => {
         this.option.series[0].label.color = val ? val : '#fff';
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
+    eColor: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].emphasis.lineStyle.color = val ? val : '#42cccc';
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
+    fontSize: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].label.fontSize = val;
         this.curstomDom.setOption(this.option); //设置配置项
       });
     },
