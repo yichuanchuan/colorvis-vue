@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-23 16:18:09
+ * @LastEditTime: 2023-04-24 15:41:13
 -->
 <template>
   <div class="threeDPage">
@@ -46,6 +46,8 @@
         <span>所属几何体：</span>
         <span id="from"></span>
       </p>
+    </div>
+    <el-drawer :visible.sync="drawer" direction="rtl" custom-class="threeD" :modal="false">
       <el-input clearable v-model="colorValue" placeholder="请输入lab颜色" size="small" @change="changeColor"> </el-input>
       <!-- 一级颜色 -->
       <el-select
@@ -88,7 +90,7 @@
       </el-select>
       <!-- 是否以线框展示 -->
       <div class="switch">
-        <span>是否以线框展示:</span>
+        <span style="color: #000; margin-left: 10px">是否以线框展示:</span>
         <el-switch
           v-model="status"
           active-color="#13ce66"
@@ -97,6 +99,9 @@
           @change="statusChange"
         ></el-switch>
       </div>
+    </el-drawer>
+    <div class="fixed" @click="drawer = true">
+      <i class="el-icon-s-operation"></i>
     </div>
   </div>
 </template>
@@ -126,6 +131,7 @@ export default {
   },
   data() {
     return {
+      drawer: false,
       firstLevelList: [], // 第一层级列表
       secondLevelList: [], // 第二层级列表
       thirdLevelList: [], // 第三层级列表
@@ -597,13 +603,30 @@ export default {
     display: flex;
     flex-direction: column;
   }
-  .el-select {
+  .fixed {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    i {
+      cursor: pointer;
+    }
+  }
+}
+.threeD {
+  width: 240px !important;
+  .el-input {
     width: 220px !important;
     margin-top: 15px;
   }
   .switch {
     text-align: left;
     margin-top: 15px;
+  }
+  .el-select__tags {
+    top: 66%;
+  }
+  .el-drawer__header {
+    padding: 10px 6px 0;
   }
 }
 </style>

@@ -4,13 +4,16 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-24 14:59:05
+ * @LastEditTime: 2023-04-24 16:07:05
 -->
 <template>
   <div class="treeCharts">
     <div id="chart" :style="{ width: '100vw', height: '600px' }"></div>
     <!-- 是否展示为圆 -->
-    <div class="box">
+    <div class="fixed" @click="drawer = true">
+      <i class="el-icon-s-operation"></i>
+    </div>
+    <el-drawer :visible.sync="drawer" direction="rtl" custom-class="treeD" :modal="false">
       <div class="switch">
         <span>颜色名称：</span>
         <el-input placeholder="请输入" v-model="colorName" style="font-size: 13px" size="small" @keydown.enter.native="queryData">
@@ -20,6 +23,14 @@
       <div class="switch">
         <span>字体大小：</span>
         <el-input-number v-model="fontSize" :step="1" :min="8" :max="13" size="small" style="width: 192px"></el-input-number>
+      </div>
+      <div class="switch">
+        <span>字体旋转：</span>
+        <el-input-number v-model="fontRotato" :step="5" size="small" style="width: 192px"></el-input-number>
+      </div>
+      <div class="switch">
+        <span>字体位置：</span>
+        <el-switch v-model="textLeft" active-color="#13ce66" inactive-color="#ff4949" :active-text="textLeft ? 'left' : 'rigth'"></el-switch>
       </div>
       <div class="switch">
         <span>是否展示为圆：</span>
@@ -43,7 +54,7 @@
         <span>文字颜色：</span>
         <el-color-picker v-model="fontColor"></el-color-picker>
       </div>
-    </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -54,7 +65,10 @@ export default {
   name: 'threeDPage', // 层级树
   data() {
     return {
+      drawer: false,
+      textLeft: false,
       colorName: '',
+      fontRotato: 0,
       fontSize: 9,
       lineColor: '#fff',
       fontColor: '#fff',
@@ -288,27 +302,48 @@ export default {
         this.curstomDom.setOption(this.option); //设置配置项
       });
     },
+    fontRotato: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].label.rotate = val;
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
+    textLeft: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].label.align = val ? 'left' : 'right';
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .treeCharts {
-  .el-icon-search {
-    line-height: 32px;
-  }
-  .box {
+  .fixed {
     position: absolute;
-    top: 15px;
-    left: 20px;
+    right: 10px;
+    top: 10px;
+    i {
+      cursor: pointer;
+      color: #fff;
+    }
   }
+}
+.treeD {
+  padding: 0 10px;
+  width: 240px !important;
   .switch {
+    .el-icon-search {
+      line-height: 32px;
+    }
     color: #fff;
     text-align: left;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     span {
+      color: #000;
       white-space: nowrap;
       font-size: 14px;
     }
@@ -319,6 +354,9 @@ export default {
   .el-color-picker__trigger {
     width: 25px;
     height: 25px;
+  }
+  .el-drawer__header {
+    padding: 10px 6px 0;
   }
 }
 </style>
