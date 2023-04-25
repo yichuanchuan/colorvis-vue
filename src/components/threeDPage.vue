@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-24 15:41:13
+ * @LastEditTime: 2023-04-25 15:04:58
 -->
 <template>
   <div class="threeDPage">
@@ -608,6 +608,8 @@ export default {
     right: 10px;
     top: 10px;
     i {
+      font-size: 24px;
+      text-shadow: 0px 0px 2px #000;
       cursor: pointer;
     }
   }
