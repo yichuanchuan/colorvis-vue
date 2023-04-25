@@ -4,11 +4,11 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-24 16:07:05
+ * @LastEditTime: 2023-04-25 12:03:09
 -->
 <template>
   <div class="treeCharts">
-    <div id="chart" :style="{ width: '100vw', height: '600px' }"></div>
+    <div id="chart" :style="{ width: '100vw', height: '700px' }"></div>
     <!-- 是否展示为圆 -->
     <div class="fixed" @click="drawer = true">
       <i class="el-icon-s-operation"></i>
@@ -23,14 +23,6 @@
       <div class="switch">
         <span>字体大小：</span>
         <el-input-number v-model="fontSize" :step="1" :min="8" :max="13" size="small" style="width: 192px"></el-input-number>
-      </div>
-      <div class="switch">
-        <span>字体旋转：</span>
-        <el-input-number v-model="fontRotato" :step="5" size="small" style="width: 192px"></el-input-number>
-      </div>
-      <div class="switch">
-        <span>字体位置：</span>
-        <el-switch v-model="textLeft" active-color="#13ce66" inactive-color="#ff4949" :active-text="textLeft ? 'left' : 'rigth'"></el-switch>
       </div>
       <div class="switch">
         <span>是否展示为圆：</span>
@@ -66,15 +58,13 @@ export default {
   data() {
     return {
       drawer: false,
-      textLeft: false,
       colorName: '',
-      fontRotato: 0,
       fontSize: 9,
       lineColor: '#fff',
       fontColor: '#fff',
       eColor: '#42cccc',
       currentDataIndexs: [], // 高亮节点index
-      status: false,
+      status: true,
       firstLevelList: [], // 第一层级列表
       secondLevelList: [], // 第二层级列表
       thirdLevelList: [], // 第三层级列表
@@ -94,33 +84,20 @@ export default {
             lineStyle: {
               color: '#fff',
             },
+            layout: 'radial', // 设置为 radial 布局方式
+            symbol: 'emptyCircle',
+            symbolSize: 7,
+            initialTreeDepth: 4,
+            animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
                 color: '#42cccc',
               },
             },
-            top: '8%',
-            bottom: '20%',
-            symbol: 'emptyCircle',
-            orient: 'vertical',
-            expandAndCollapse: true,
             label: {
-              position: 'top',
-              rotate: 0,
-              verticalAlign: 'middle',
-              align: 'right',
               fontSize: 9,
               color: '#fff',
             },
-            leaves: {
-              label: {
-                position: 'bottom',
-                rotate: -90,
-                verticalAlign: 'middle',
-                align: 'left',
-              },
-            },
-            animationDurationUpdate: 750,
           },
         ],
       },
@@ -212,18 +189,21 @@ export default {
           type: 'downplay',
           dataIndex: that.currentDataIndexs,
         });
-
-        // 针对非最尾节点点击收缩展开后已高亮线路失效
-        if (params.data.children) {
-          that.curstomDom.dispatchAction({
-            type: 'highlight',
-            dataIndex: that.currentDataIndexs,
-          });
-          return;
-        }
-
         const treeAncestors = params.treeAncestors;
         const dataIndexs = treeAncestors.map((item) => item.dataIndex);
+        // 针对非最尾节点点击收缩展开后已高亮线路失效
+        if (
+          dataIndexs.length > 0 &&
+          that.currentDataIndexs.length > 0 &&
+          dataIndexs[dataIndexs.length - 1] === that.currentDataIndexs[that.currentDataIndexs.length - 1]
+        ) {
+          that.currentDataIndexs = [];
+          return;
+        }
+        if (params.data.children) {
+          that.currentDataIndexs = [];
+          return;
+        }
         // 重新保存当前高亮的节点
         that.currentDataIndexs = dataIndexs;
         // 高亮相关节点连线
@@ -253,10 +233,73 @@ export default {
     },
     statusChange() {
       if (this.status) {
-        this.option.series[0].layout = 'radial';
+        this.option.series = [
+          {
+            type: 'tree',
+            data: [this.firstLevelList],
+            left: '2%',
+            right: '2%',
+            lineStyle: {
+              color: this.lineColor,
+            },
+            layout: 'radial', // 设置为 radial 布局方式
+            symbol: 'emptyCircle',
+            symbolSize: 7,
+            initialTreeDepth: 4,
+            animationDurationUpdate: 750,
+            emphasis: {
+              lineStyle: {
+                color: this.eColor,
+              },
+            },
+            label: {
+              fontSize: this.fontSize,
+              color: this.fontColor,
+            },
+          },
+        ];
       } else {
-        this.option.series[0].layout = '';
+        this.option.series = [
+          {
+            type: 'tree',
+            data: [this.firstLevelList],
+            left: '2%',
+            right: '2%',
+            lineStyle: {
+              color: this.lineColor,
+            },
+            layout: '',
+            symbol: 'emptyCircle',
+            orient: 'vertical',
+            symbolSize: 7,
+            initialTreeDepth: 4,
+            animationDurationUpdate: 750,
+            emphasis: {
+              lineStyle: {
+                color: this.eColor,
+              },
+            },
+            label: {
+              fontSize: this.fontSize,
+              color: this.fontColor,
+              position: 'left',
+              verticalAlign: 'middle',
+              align: 'right',
+            },
+            leaves: {
+              label: {
+                position: 'bottom',
+                rotate: -90,
+                verticalAlign: 'middle',
+                align: 'left',
+                fontSize: this.fontSize,
+                color: this.fontColor,
+              },
+            },
+          },
+        ];
       }
+      this.curstomDom.clear();
       this.curstomDom.setOption(this.option); //设置配置项
     },
   },
@@ -287,6 +330,7 @@ export default {
     fontColor: function (val) {
       this.$nextTick(() => {
         this.option.series[0].label.color = val ? val : '#fff';
+        if (!this.status) this.option.series[0].leaves.label.color = val ? val : '#fff';
         this.curstomDom.setOption(this.option); //设置配置项
       });
     },
@@ -299,18 +343,7 @@ export default {
     fontSize: function (val) {
       this.$nextTick(() => {
         this.option.series[0].label.fontSize = val;
-        this.curstomDom.setOption(this.option); //设置配置项
-      });
-    },
-    fontRotato: function (val) {
-      this.$nextTick(() => {
-        this.option.series[0].label.rotate = val;
-        this.curstomDom.setOption(this.option); //设置配置项
-      });
-    },
-    textLeft: function (val) {
-      this.$nextTick(() => {
-        this.option.series[0].label.align = val ? 'left' : 'right';
+        if (!this.status) this.option.series[0].leaves.label.fontSize = val;
         this.curstomDom.setOption(this.option); //设置配置项
       });
     },
