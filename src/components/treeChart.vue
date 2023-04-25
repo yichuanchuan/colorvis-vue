@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 12:03:09
+ * @LastEditTime: 2023-04-25 12:17:07
 -->
 <template>
   <div class="treeCharts">
@@ -87,7 +87,7 @@ export default {
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
             symbolSize: 7,
-            initialTreeDepth: 4,
+            initialTreeDepth: 2,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -114,6 +114,7 @@ export default {
       if (data && data.length > 0) {
         let arr = data.map((item) => item.index);
         this.currentDataIndexs = [0, ...arr];
+        console.log(data);
         // 高亮点击已保存的相关节点的连线，防止上一步取消了已保存节点的高亮
         this.curstomDom.dispatchAction({
           type: 'highlight',
@@ -171,9 +172,19 @@ export default {
             index += 1;
             val.index = index;
             item.children.push(val);
+            val.children = [];
+            this.thirdLevelList.forEach((o) => {
+              o.name = o.color;
+              if (o.parent == val.color) {
+                index += 1;
+                o.index = index;
+                val.children.push(o);
+              }
+            });
           }
         });
       });
+      console.log(this.firstLevelList);
       this.firstLevelList = {
         index: 1,
         name: '中国传统色',
@@ -245,7 +256,7 @@ export default {
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
             symbolSize: 7,
-            initialTreeDepth: 4,
+            initialTreeDepth: 2,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -272,7 +283,7 @@ export default {
             symbol: 'emptyCircle',
             orient: 'vertical',
             symbolSize: 7,
-            initialTreeDepth: 4,
+            initialTreeDepth: 2,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -306,8 +317,8 @@ export default {
   created() {
     this.index = 0;
     this.parseCsvData('/assets/color/firstLevel.csv', 'firstLevelList');
-    this.parseCsvData('/assets/color/secondLevel.csv', 'secondLevelList');
-    this.parseCsvData('/assets/color/thirdLevel.csv', 'thirdLevelList');
+    this.parseCsvData('/assets/color/secondOhterLevel.csv', 'secondLevelList');
+    this.parseCsvData('/assets/color/thirdOtherLevel.csv', 'thirdLevelList');
   },
   mounted() {
     // 柱状图实例化
