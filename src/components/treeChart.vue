@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 16:58:09
+ * @LastEditTime: 2023-04-25 17:22:09
 -->
 <template>
   <div class="treeCharts">
@@ -22,7 +22,7 @@
       </div>
       <div class="switch">
         <span>字体大小：</span>
-        <el-input-number v-model="fontSize" :step="1" :min="8" :max="13" size="small" style="width: 192px"></el-input-number>
+        <el-input-number v-model="fontSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
         <span>是否展示为圆：</span>
@@ -62,7 +62,7 @@ export default {
     return {
       drawer: false,
       colorName: '',
-      fontSize: 9,
+      fontSize: 5,
       lineColor: '#fff',
       fontColor: '#fff',
       eColor: '#42cccc',
@@ -99,7 +99,7 @@ export default {
               },
             },
             label: {
-              fontSize: 9,
+              fontSize: 5,
               color: '#fff',
             },
           },
