@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 15:04:58
+ * @LastEditTime: 2023-04-25 15:11:51
 -->
 <template>
   <div class="threeDPage">
@@ -605,7 +605,7 @@ export default {
   }
   .fixed {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 10px;
     i {
       font-size: 24px;

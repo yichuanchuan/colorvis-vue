@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 15:06:18
+ * @LastEditTime: 2023-04-25 16:30:28
 -->
 <template>
   <div class="treeCharts">
@@ -52,7 +52,10 @@
 
 <script>
 import * as echarts from 'echarts';
+import { colord, extend } from 'colord';
+import labPlugin from 'colord/plugins/lab';
 import Papa from 'papaparse';
+extend([labPlugin]);
 export default {
   name: 'threeDPage', // 层级树
   data() {
@@ -83,11 +86,12 @@ export default {
             right: '2%',
             lineStyle: {
               color: '#fff',
+              type: 'cross',
             },
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
             symbolSize: 7,
-            initialTreeDepth: 2,
+            initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -114,7 +118,6 @@ export default {
       if (data && data.length > 0) {
         let arr = data.map((item) => item.index);
         this.currentDataIndexs = [0, ...arr];
-        console.log(data);
         // 高亮点击已保存的相关节点的连线，防止上一步取消了已保存节点的高亮
         this.curstomDom.dispatchAction({
           type: 'highlight',
@@ -166,25 +169,32 @@ export default {
         item.index = index;
         item.name = item.color;
         item.children = [];
-        this.secondLevelList.forEach((val) => {
+        this.secondLevelList.forEach((e) => {
+          let val = { ...e };
           val.name = val.color;
           if (val.parent == item.color) {
             index += 1;
             val.index = index;
             item.children.push(val);
             val.children = [];
-            this.thirdLevelList.forEach((o) => {
+            this.thirdLevelList.forEach((p) => {
+              let o = { ...p };
               o.name = o.color;
               if (o.parent == val.color) {
                 index += 1;
                 o.index = index;
+                o.itemStyle = {
+                  color: colord({ l: o.l, a: o.a, b: o.b }).toHex(),
+                };
+                o.label = {
+                  color: colord({ l: o.l, a: o.a, b: o.b }).toHex(),
+                };
                 val.children.push(o);
               }
             });
           }
         });
       });
-      console.log(this.firstLevelList);
       this.firstLevelList = {
         index: 1,
         name: '中国传统色',
@@ -256,7 +266,7 @@ export default {
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
             symbolSize: 7,
-            initialTreeDepth: 2,
+            initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -283,7 +293,7 @@ export default {
             symbol: 'emptyCircle',
             orient: 'vertical',
             symbolSize: 7,
-            initialTreeDepth: 2,
+            initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
               lineStyle: {
@@ -318,7 +328,7 @@ export default {
     this.index = 0;
     this.parseCsvData('/assets/color/firstLevel.csv', 'firstLevelList');
     this.parseCsvData('/assets/color/secondOhterLevel.csv', 'secondLevelList');
-    this.parseCsvData('/assets/color/thirdOtherLevel.csv', 'thirdLevelList');
+    this.parseCsvData('/assets/color/other.csv', 'thirdLevelList');
   },
   mounted() {
     // 柱状图实例化
@@ -366,7 +376,7 @@ export default {
 .treeCharts {
   .fixed {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 10px;
     i {
       font-size: 24px;
