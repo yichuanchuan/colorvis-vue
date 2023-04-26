@@ -4,12 +4,11 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 09:29:13
+ * @LastEditTime: 2023-04-26 09:31:49
 -->
 <template>
   <div class="treeCharts">
     <div id="chart" :style="{ width: '100vw', height: '700px' }"></div>
-    <!-- 是否展示为圆 -->
     <div class="fixed" @click="drawer = true">
       <i class="el-icon-s-operation"></i>
     </div>
@@ -33,7 +32,7 @@
         <el-input-number v-model="symbolSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
-        <span>是否展示为圆：</span>
+        <span>环形树图：</span>
         <el-switch
           v-model="status"
           active-color="#13ce66"
