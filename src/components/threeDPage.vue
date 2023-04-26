@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 10:23:55
+ * @LastEditTime: 2023-04-26 10:26:24
 -->
 <template>
   <div class="threeDPage">
@@ -359,7 +359,7 @@ export default {
         let position = new THREE.Vector3(x, y, z);
         // 存入每个点坐标位置
         let convexSphere = this.creatSphere(position, c);
-        convexSphere.name = '自定义';
+        convexSphere.name = '未知';
         this.group.add(convexSphere);
         scene.add(this.group);
         if (!flag) {
