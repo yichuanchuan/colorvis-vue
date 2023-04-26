@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 10:20:02
+ * @LastEditTime: 2023-04-26 10:23:55
 -->
 <template>
   <div class="threeDPage">
@@ -349,7 +349,7 @@ export default {
         this.firstLevelChange(this.firstColorValue, true);
         this.secondLevelChange(this.secondColorValue, true);
       }
-      let reg = /^(100|\d{1,2}),(-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
+      let reg = /^(100|\d{1,2}),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
       if (reg.test(val)) {
         let arr = val.split(',');
         const c = colord({ l: arr[0], a: arr[1], b: arr[2] }).toHex();
