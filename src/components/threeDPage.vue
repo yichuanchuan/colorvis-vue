@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 10:11:32
+ * @LastEditTime: 2023-04-26 10:20:02
 -->
 <template>
   <div class="threeDPage">
@@ -419,13 +419,13 @@ export default {
           });
           switch (translateType) {
             case 'x':
-              textGeometry.translate(position ? Number(position) : 0.5, position ? 0 : 0.1, -0.1);
+              textGeometry.translate(position ? Number(position) : 1.1, position ? 0 : 0, -0.1);
               break;
             case 'y':
-              textGeometry.translate(position ? -0.1 : -0.2, position ? Number(position) : 0.5, -0.1);
+              textGeometry.translate(position ? -0.1 : -0.1, position ? Number(position) : 1.1, -0.1);
               break;
             case 'z':
-              textGeometry.translate(position ? -0.1 : -0.2, 0, position ? Number(position) : 0.5);
+              textGeometry.translate(position ? -0.1 : -0.1, 0, position ? Number(position) : 1.1);
               break;
           }
           // 创建一个文本网格
@@ -453,9 +453,9 @@ export default {
       // 创建一个文本几何体
       this.loader = new FontLoader();
       this.textGroup = new THREE.Group();
-      let coordinate = ['l', 'a', 'b'];
+      let coordinate = ['L*', 'a*', 'b*'];
       coordinate.forEach((item) => {
-        this.textLoader(item, '', item == 'l' ? 'y' : item == 'a' ? 'z' : 'x', 0xffffff, 0.1);
+        this.textLoader(item, '', item == 'L*' ? 'y' : item == 'a*' ? 'z' : 'x', 0xffffff, 0.06);
       });
       // 增加x、y、z刻度
       let l = ['-128', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
