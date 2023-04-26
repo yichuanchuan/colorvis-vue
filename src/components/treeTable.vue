@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-26 14:25:14
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 17:35:48
+ * @LastEditTime: 2023-04-26 17:45:59
 -->
 <template>
   <div class="tree_container">
@@ -63,7 +63,9 @@
             </div>
             <div class="color-content">
               <div class="content-item" v-for="(val, i) in item.children" :key="i">
-                <div class="color-item" :style="{ background: val.hex }"></div>
+                <div class="color-item" :style="{ background: val.hex }">
+                  <span style="color: #fff; display: none; font-size: 12px" class="hex">{{ val.hex }}</span>
+                </div>
                 <div class="color-name">{{ val.color }}</div>
               </div>
             </div>
@@ -268,7 +270,7 @@ export default {
       height: calc(100vh - 266px);
       overflow: auto;
       &::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
       }
       &::-webkit-scrollbar-thumb {
         border-radius: 5px;
@@ -298,17 +300,26 @@ export default {
           flex-wrap: wrap;
           margin-bottom: 10px;
           .content-item {
-            width: 160px;
-            margin: 0 8px;
+            width: 140px;
+            margin: 0 19px;
             .color-item {
               width: 100%;
               height: 40px;
               border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              &:hover {
+                .hex {
+                  display: block;
+                }
+              }
             }
             .color-name {
               text-align: center;
               color: #fff;
-              font-size: 13px;
+              font-size: 12px;
               margin: 5px 0;
             }
           }
