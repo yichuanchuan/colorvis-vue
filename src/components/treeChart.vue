@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 09:31:49
+ * @LastEditTime: 2023-04-26 09:37:55
 -->
 <template>
   <div class="treeCharts">
@@ -69,8 +69,8 @@ export default {
     return {
       drawer: false,
       colorName: '',
-      symbolSize: 7,
-      fontSize: 8,
+      symbolSize: 2,
+      fontSize: 10,
       otherFontSize: 5,
       lineColor: '#fff',
       fontColor: '#fff',
@@ -99,7 +99,7 @@ export default {
             },
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
-            symbolSize: 7,
+            symbolSize: 2,
             initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
@@ -108,7 +108,7 @@ export default {
               },
             },
             label: {
-              fontSize: 8,
+              fontSize: 10,
               color: '#fff',
             },
             leaves: {
