@@ -4,11 +4,12 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 10:10:36
+ * @LastEditTime: 2023-04-26 14:19:52
 -->
 <template>
   <div class="treeCharts">
     <div id="chart" :style="{ width: '100vw', height: '700px' }"></div>
+    <img src="/assets/leftTop.png" class="leftTop-png" />
     <div class="fixed" @click="drawer = true">
       <i class="el-icon-s-operation"></i>
     </div>
@@ -20,11 +21,11 @@
         </el-select>
       </div>
       <div class="switch">
-        <span>字体大小：</span>
+        <span>类名字号：</span>
         <el-input-number v-model="fontSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
-        <span>叶子节点：</span>
+        <span>色名字号：</span>
         <el-input-number v-model="otherFontSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
@@ -416,6 +417,12 @@ export default {
       text-shadow: 0px 0px 2px #000;
       color: #fff;
     }
+  }
+  .leftTop-png {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 380px;
   }
 }
 .treeD {
