@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 17:22:09
+ * @LastEditTime: 2023-04-26 09:29:13
 -->
 <template>
   <div class="treeCharts">
@@ -23,6 +23,14 @@
       <div class="switch">
         <span>字体大小：</span>
         <el-input-number v-model="fontSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
+      </div>
+      <div class="switch">
+        <span>叶子节点：</span>
+        <el-input-number v-model="otherFontSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
+      </div>
+      <div class="switch">
+        <span>圆球大小：</span>
+        <el-input-number v-model="symbolSize" :step="1" :min="1" :max="13" size="small" style="width: 192px"></el-input-number>
       </div>
       <div class="switch">
         <span>是否展示为圆：</span>
@@ -62,7 +70,9 @@ export default {
     return {
       drawer: false,
       colorName: '',
-      fontSize: 5,
+      symbolSize: 7,
+      fontSize: 8,
+      otherFontSize: 5,
       lineColor: '#fff',
       fontColor: '#fff',
       eColor: '#42cccc',
@@ -99,8 +109,13 @@ export default {
               },
             },
             label: {
-              fontSize: 5,
+              fontSize: 8,
               color: '#fff',
+            },
+            leaves: {
+              label: {
+                fontSize: 5,
+              },
             },
           },
         ],
@@ -265,7 +280,7 @@ export default {
             },
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
-            symbolSize: 7,
+            symbolSize: this.symbolSize,
             initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
@@ -276,6 +291,11 @@ export default {
             label: {
               fontSize: this.fontSize,
               color: this.fontColor,
+            },
+            leaves: {
+              label: {
+                fontSize: this.otherFontSize,
+              },
             },
           },
         ];
@@ -292,7 +312,7 @@ export default {
             layout: '',
             symbol: 'emptyCircle',
             orient: 'vertical',
-            symbolSize: 7,
+            symbolSize: this.symbolSize,
             initialTreeDepth: 3,
             animationDurationUpdate: 750,
             emphasis: {
@@ -313,7 +333,7 @@ export default {
                 rotate: -90,
                 verticalAlign: 'middle',
                 align: 'left',
-                fontSize: this.fontSize,
+                fontSize: this.otherFontSize,
                 color: this.fontColor,
               },
             },
@@ -364,7 +384,18 @@ export default {
     fontSize: function (val) {
       this.$nextTick(() => {
         this.option.series[0].label.fontSize = val;
-        if (!this.status) this.option.series[0].leaves.label.fontSize = val;
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
+    symbolSize: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].symbolSize = val;
+        this.curstomDom.setOption(this.option); //设置配置项
+      });
+    },
+    otherFontSize: function (val) {
+      this.$nextTick(() => {
+        this.option.series[0].leaves.label.fontSize = val;
         this.curstomDom.setOption(this.option); //设置配置项
       });
     },
