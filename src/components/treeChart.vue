@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 09:49:17
+ * @LastEditTime: 2023-04-26 10:10:36
 -->
 <template>
   <div class="treeCharts">
@@ -212,6 +212,9 @@ export default {
         index: 1,
         name: '中国传统色',
         children: this.firstLevelList,
+        label: {
+          rotate: 360,
+        },
       };
       this.getBarParams();
     },
