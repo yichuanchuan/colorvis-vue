@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 10:50:51
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-23 16:46:42
+ * @LastEditTime: 2023-04-26 14:26:12
 -->
 <template>
   <div id="app">
@@ -17,6 +17,9 @@
         <el-tab-pane label="色名关系" name="second">
           <treeChart />
         </el-tab-pane>
+        <el-tab-pane label="色名列表" name="third">
+          <treeTable />
+        </el-tab-pane>
       </el-tabs>
       <div class="backGroud">
         <el-color-picker v-model="backGroudColor"></el-color-picker>
@@ -28,9 +31,10 @@
 <script>
 import threeDPage from './components/threeDPage.vue';
 import treeChart from './components/treeChart.vue';
+import treeTable from './components/treeTable.vue';
 export default {
   name: 'App',
-  components: { threeDPage, treeChart },
+  components: { threeDPage, treeChart, treeTable },
   data() {
     return {
       activeName: 'first',
