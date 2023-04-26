@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 09:46:50
+ * @LastEditTime: 2023-04-26 09:49:17
 -->
 <template>
   <div class="treeCharts">
@@ -15,9 +15,9 @@
     <el-drawer :visible.sync="drawer" direction="rtl" custom-class="treeD" :modal="false">
       <div class="switch">
         <span>颜色名称：</span>
-        <el-input placeholder="请输入" v-model="colorName" style="font-size: 13px" size="small" @keydown.enter.native="queryData">
-          <i slot="suffix" class="el-icon-search" @click="queryData"></i>
-        </el-input>
+        <el-select v-model="colorName" placeholder="请选择" size="small" collapse-tags filterable clearable @change="queryData">
+          <el-option v-for="(item, index) in thirdLevelList" :key="index" :label="item.color" :value="item.color"> </el-option>
+        </el-select>
       </div>
       <div class="switch">
         <span>字体大小：</span>
