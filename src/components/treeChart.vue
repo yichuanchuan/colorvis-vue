@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 09:37:55
+ * @LastEditTime: 2023-04-26 09:46:50
 -->
 <template>
   <div class="treeCharts">
@@ -72,7 +72,7 @@ export default {
       symbolSize: 2,
       fontSize: 10,
       otherFontSize: 5,
-      lineColor: '#fff',
+      lineColor: '#7d7d7d',
       fontColor: '#fff',
       eColor: '#42cccc',
       currentDataIndexs: [], // 高亮节点index
@@ -94,8 +94,7 @@ export default {
             left: '2%',
             right: '2%',
             lineStyle: {
-              color: '#fff',
-              type: 'cross',
+              color: '#7d7d7d',
             },
             layout: 'radial', // 设置为 radial 布局方式
             symbol: 'emptyCircle',
