@@ -3,12 +3,16 @@
  * @Version: 2.0
  * @Author: yichuanhao
  * @Date: 2023-04-26 14:25:14
- * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 17:45:59
+ * @LastEditors: yichuanhao 1274816963@qq.com
+ * @LastEditTime: 2023-04-26 19:12:48
 -->
 <template>
   <div class="tree_container">
     <div class="content">
+      <div class="header-btn">
+        <div class="button" @click="checkAll">全选</div>
+        <div class="button" @click="removeAll">清除</div>
+      </div>
       <!-- 一级五色调 -->
       <div class="first-color">
         <div class="title">一级五色调</div>
@@ -64,7 +68,9 @@
             <div class="color-content">
               <div class="content-item" v-for="(val, i) in item.children" :key="i">
                 <div class="color-item" :style="{ background: val.hex }">
-                  <span style="color: #fff; display: none; font-size: 12px" class="hex">{{ val.hex }}</span>
+                  <span style="color: #fff; display: none; font-size: 12px" class="hex">{{
+                    `Lab(${Number(val.l).toFixed(0)}, ${Number(val.a).toFixed(0)}, ${Number(val.b).toFixed(0)})`
+                  }}</span>
                 </div>
                 <div class="color-name">{{ val.color }}</div>
               </div>
@@ -94,6 +100,26 @@ export default {
     };
   },
   methods: {
+    checkAll() {
+      this.firstLevelList.forEach((item) => {
+        item.isChecked = true;
+      });
+      this.secondLevelList.forEach((item) => {
+        item.isChecked = true;
+        item.isActive = true;
+      });
+      this.searchThidLevel();
+    },
+    removeAll() {
+      this.firstLevelList.forEach((item) => {
+        item.isChecked = false;
+      });
+      this.secondLevelList.forEach((item) => {
+        item.isChecked = false;
+        item.isActive = false;
+      });
+      this.thirdLevelList = [];
+    },
     clickFirst(val) {
       val.isChecked = !val.isChecked;
       this.secondActiveList = [];
@@ -185,6 +211,25 @@ export default {
     max-width: 900px;
     min-width: 900px;
     height: 100%;
+    .header-btn {
+      display: flex;
+      margin: 10px 0;
+      .button {
+        width: 80px;
+        height: 26px;
+        line-height: 26px;
+        margin: 0 5px;
+        border-radius: 8px;
+        border: 1px solid rgb(127, 127, 127);
+        color: #ddd;
+        font-size: 13px;
+        cursor: pointer;
+        &:hover {
+          color: #fff;
+          border: 1px solid #fff;
+        }
+      }
+    }
     .first-color {
       margin-top: 20px;
       .title {
