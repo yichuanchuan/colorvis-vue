@@ -312,7 +312,7 @@ export default {
               cursor: pointer;
               &:hover {
                 .hex {
-                  display: block;
+                  display: block !important;
                 }
               }
             }
