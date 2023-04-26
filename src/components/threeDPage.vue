@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-25 15:11:51
+ * @LastEditTime: 2023-04-26 10:11:32
 -->
 <template>
   <div class="threeDPage">
@@ -13,7 +13,7 @@
     </div>
     <div class="info" id="info">
       <p class="title-top">
-        <span>颜色：</span>
+        <span>HEX：</span>
         <span id="name"></span>
       </p>
       <p>
@@ -39,11 +39,11 @@
         <span id="colorName"></span>
       </p>
       <p>
-        <span>from：</span>
+        <span>色值来源：</span>
         <span id="from"></span>
       </p>
       <p>
-        <span>所属几何体：</span>
+        <span>近似色名：</span>
         <span id="from"></span>
       </p>
     </div>
