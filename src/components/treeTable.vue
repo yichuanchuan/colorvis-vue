@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-26 14:25:14
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-27 09:28:14
+ * @LastEditTime: 2023-04-27 09:34:03
 -->
 <template>
   <div class="tree_container">
@@ -24,7 +24,7 @@
             <i class="el-icon-warning-outline select-icon"></i>
           </el-tooltip>
 
-          <el-select v-model="colorM" placeholder="请选择" size="small">
+          <el-select v-model="colorM" placeholder="请选择" size="small" style="width: 160px">
             <el-option label="HEX" :value="1"> </el-option>
             <el-option label="RGB" :value="2"> </el-option>
             <el-option label="CIE L*a*b*" :value="3"> </el-option>
@@ -261,7 +261,7 @@ export default {
       justify-content: space-between;
       .header-btn {
         display: flex;
-        margin: 20px 0 10px 0;
+        margin: 20px 0 10px 5px;
         .button {
           width: 80px;
           height: 26px;
@@ -280,8 +280,11 @@ export default {
       }
       .header-select {
         display: flex;
-        margin: 20px 0 10px 0;
+        margin: 20px 10px 10px 0;
         align-items: center;
+        .el-input__inner {
+          border-radius: 8px;
+        }
         .select-icon {
           font-size: 18px;
           margin-right: 10px;
