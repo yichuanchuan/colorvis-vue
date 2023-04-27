@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-26 14:25:14
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-27 09:34:03
+ * @LastEditTime: 2023-04-27 09:39:03
 -->
 <template>
   <div class="tree_container">
@@ -376,7 +376,7 @@ export default {
       margin-bottom: 16px;
     }
     .third-content {
-      height: calc(100vh - 266px);
+      height: calc(100vh - 350px);
       overflow: auto;
       &::-webkit-scrollbar {
         width: 10px;
