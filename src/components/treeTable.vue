@@ -3,15 +3,33 @@
  * @Version: 2.0
  * @Author: yichuanhao
  * @Date: 2023-04-26 14:25:14
- * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-04-26 19:12:48
+ * @LastEditors: yichuanhao
+ * @LastEditTime: 2023-04-27 09:28:14
 -->
 <template>
   <div class="tree_container">
     <div class="content">
-      <div class="header-btn">
-        <div class="button" @click="checkAll">全选</div>
-        <div class="button" @click="removeAll">清除</div>
+      <div class="header">
+        <div class="header-btn">
+          <div class="button" @click="checkAll">全选</div>
+          <div class="button" @click="removeAll">清除</div>
+        </div>
+        <div class="header-select">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="此页色值取自收录的原始数据中，同名异色值的质心为值。如需全部原始数据请联系我们"
+            placement="left"
+          >
+            <i class="el-icon-warning-outline select-icon"></i>
+          </el-tooltip>
+
+          <el-select v-model="colorM" placeholder="请选择" size="small">
+            <el-option label="HEX" :value="1"> </el-option>
+            <el-option label="RGB" :value="2"> </el-option>
+            <el-option label="CIE L*a*b*" :value="3"> </el-option>
+          </el-select>
+        </div>
       </div>
       <!-- 一级五色调 -->
       <div class="first-color">
@@ -69,7 +87,11 @@
               <div class="content-item" v-for="(val, i) in item.children" :key="i">
                 <div class="color-item" :style="{ background: val.hex }">
                   <span style="color: #fff; display: none; font-size: 12px" class="hex">{{
-                    `Lab(${Number(val.l).toFixed(0)}, ${Number(val.a).toFixed(0)}, ${Number(val.b).toFixed(0)})`
+                    colorM == 1
+                      ? val.hex
+                      : colorM == 2
+                      ? `rgb(${colorToRgb(val.hex).join(',')})`
+                      : `${Number(val.l).toFixed(0)}, ${Number(val.a).toFixed(0)}, ${Number(val.b).toFixed(0)}`
                   }}</span>
                 </div>
                 <div class="color-name">{{ val.color }}</div>
@@ -91,6 +113,7 @@ export default {
   name: 'treeTable', // 色名列表
   data() {
     return {
+      colorM: 1,
       firstLevelList: [],
       secondLevelList: [],
       secondOhterLevel: [],
@@ -191,6 +214,28 @@ export default {
       op = Array.from(new Set(op));
       return op;
     },
+    colorToRgb(sColor) {
+      sColor = sColor.toLowerCase();
+      //十六进制颜色值的正则表达式
+      var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+      // 如果是16进制颜色
+      if (sColor && reg.test(sColor)) {
+        if (sColor.length === 4) {
+          var sColorNew = '#';
+          for (var i = 1; i < 4; i += 1) {
+            sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
+          }
+          sColor = sColorNew;
+        }
+        //处理六位的颜色值
+        var sColorChange = [];
+        for (var i = 1; i < 7; i += 2) {
+          sColorChange.push(parseInt('0x' + sColor.slice(i, i + 2)));
+        }
+        return sColorChange;
+      }
+      return sColor;
+    },
   },
   created() {
     this.parseCsvData('/assets/color/firstLevel.csv', 'firstLevelList');
@@ -211,25 +256,41 @@ export default {
     max-width: 900px;
     min-width: 900px;
     height: 100%;
-    .header-btn {
+    .header {
       display: flex;
-      margin: 10px 0;
-      .button {
-        width: 80px;
-        height: 26px;
-        line-height: 26px;
-        margin: 0 5px;
-        border-radius: 8px;
-        border: 1px solid rgb(127, 127, 127);
-        color: #ddd;
-        font-size: 13px;
-        cursor: pointer;
-        &:hover {
+      justify-content: space-between;
+      .header-btn {
+        display: flex;
+        margin: 20px 0 10px 0;
+        .button {
+          width: 80px;
+          height: 26px;
+          line-height: 26px;
+          margin: 0 5px;
+          border-radius: 8px;
+          border: 1px solid rgb(127, 127, 127);
+          color: #ddd;
+          font-size: 13px;
+          cursor: pointer;
+          &:hover {
+            color: #fff;
+            border: 1px solid #fff;
+          }
+        }
+      }
+      .header-select {
+        display: flex;
+        margin: 20px 0 10px 0;
+        align-items: center;
+        .select-icon {
+          font-size: 18px;
+          margin-right: 10px;
           color: #fff;
-          border: 1px solid #fff;
+          cursor: pointer;
         }
       }
     }
+
     .first-color {
       margin-top: 20px;
       .title {
