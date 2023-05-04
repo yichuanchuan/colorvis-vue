@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
- * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 17:19:27
+ * @LastEditors: yichuanhao 1274816963@qq.com
+ * @LastEditTime: 2023-05-04 22:06:26
 -->
 <template>
   <div class="treeCharts">
@@ -194,6 +194,7 @@ export default {
         index += 1;
         item.index = index;
         item.name = item.color;
+        item.leaves = 1;
         item.children = [];
         this.secondLevelList.forEach((e) => {
           let val = { ...e };
@@ -201,6 +202,7 @@ export default {
           if (val.parent == item.color) {
             index += 1;
             val.index = index;
+            val.leaves = 2;
             item.children.push(val);
             val.children = [];
             this.thirdLevelList.forEach((p) => {
@@ -209,6 +211,7 @@ export default {
               if (o.parent == val.color) {
                 index += 1;
                 o.index = index;
+                o.leaves = 3;
                 o.itemStyle = {
                   color: colord({ l: o.l, a: o.a, b: o.b }).toHex(),
                 };
@@ -240,32 +243,34 @@ export default {
           type: 'downplay',
           dataIndex: that.currentDataIndexs,
         });
-        let otherArr = that.secondLevel.filter((val) => {
-          return val.parent === params.name;
-        });
-        if (otherArr.length > 0 && !that.isShowOtherTree) {
-          that.isShowOtherTree = true;
-          that.otherTreeData = {
-            index: 0,
-            name: params.name,
-            children: otherArr.map((i, idx) => {
-              i.name = i.color;
-              i.index = idx + 1;
-              i.itemStyle = {
-                color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
-              };
-              i.label = {
-                color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
-              };
-              return i;
-            }),
-            label: {
-              rotate: 360,
-            },
-          };
-          that.curstomDom.clear();
-          that.option.series[0].data = [that.otherTreeData];
-          that.renderBar();
+        if (params.data.leaves == 2) {
+          let otherArr = that.secondLevel.filter((val) => {
+            return val.parent === params.name;
+          });
+          if (otherArr.length > 0 && !that.isShowOtherTree) {
+            that.isShowOtherTree = true;
+            that.otherTreeData = {
+              index: 0,
+              name: params.name,
+              children: otherArr.map((i, idx) => {
+                i.name = i.color;
+                i.index = idx + 1;
+                i.itemStyle = {
+                  color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
+                };
+                i.label = {
+                  color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
+                };
+                return i;
+              }),
+              label: {
+                rotate: 360,
+              },
+            };
+            that.curstomDom.clear();
+            that.option.series[0].data = [that.otherTreeData];
+            that.renderBar();
+          }
         }
         const treeAncestors = params.treeAncestors;
         const dataIndexs = treeAncestors.map((item) => item.dataIndex);
