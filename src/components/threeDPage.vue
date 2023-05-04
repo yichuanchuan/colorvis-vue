@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 17:27:34
+ * @LastEditTime: 2023-05-04 17:58:14
 -->
 <template>
   <div class="threeDPage">
@@ -94,6 +94,10 @@
       >
         <el-option v-for="(item, index) in thirdLevelList" :key="index" :label="item" :value="item"> </el-option>
       </el-select>
+      <!-- 其他颜色 -->
+      <el-select v-model="otherColor" placeholder="相似色名" size="small" multiple filterable clearable>
+        <el-option v-for="(item, index) in allData" :key="index" :label="item.color" :value="item.color"> </el-option>
+      </el-select>
       <!-- 是否以线框展示 -->
       <div class="switch">
         <span style="color: #000; margin-left: 10px">是否以线框展示:</span>
@@ -153,6 +157,7 @@ export default {
       firstLevel: [],
       secondLevel: [],
       thirdLevel: [],
+      otherColor: [],
     };
   },
   methods: {
@@ -365,6 +370,9 @@ export default {
         this.firstLevelChange(this.firstColorValue, true);
         this.secondLevelChange(this.secondColorValue, true);
       }
+      document.querySelector('#otherInfo').innerHTML = '';
+      document.querySelector('#otherInfo2').innerHTML = '';
+      this.otherColor = [];
       let reg = /^(100|\d{1,2}),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
       if (reg.test(val)) {
         let arr = val.split(',');
@@ -397,8 +405,21 @@ export default {
         let str1 = '';
         if (otherInfo) {
           approximationArr.forEach((item) => {
+            this.otherColor.push(item.color);
             str += item.color + '</br>';
             str1 += item.distance + '</br>';
+          });
+          approximationArr.forEach((d) => {
+            const c = colord({ l: Number(d.l), a: Number(d.a), b: Number(d.b) }).toHex();
+            const y = map(Number(d.l), 0, 100, 0, 1, true);
+            const x = map(Number(d.a), -128, 127, 0, 1, true);
+            const z = map(Number(d.b), -128, 127, 0, 1, true);
+            let position = new THREE.Vector3(x, y, z);
+            // 创建球体材质
+            let convexSphere = this.creatSphere(position, c);
+            convexSphere.name = d.color;
+            convexSphere.from = d.from;
+            this.group.add(convexSphere);
           });
         }
         document.querySelector('#otherInfo').innerHTML = str;
@@ -562,7 +583,7 @@ export default {
       canvas.addEventListener('pointermove', onPointerMove);
       let that = this;
       function onPointerMove(event) {
-        setInfo('', 0, 0, 0, '', '', '', '');
+        setInfo('', 0, 0, 0, '', '', '');
         if (!that.group) return;
         if (selectedObject) {
           selectedObject.scale.set(0.01, 0.01, 0.01);
@@ -584,20 +605,11 @@ export default {
             let l = map(res.point.y, 0, 1, 0, 100, true);
             let b = map(res.point.x, 0, 1, -128, 127, true);
             let a = map(res.point.z, 0, 1, -128, 127, true);
-            setInfo(
-              colord({ l: l, a: a, b: b }).toHex(),
-              l,
-              a,
-              b,
-              res.object.name,
-              res.object.from ? res.object.from : '',
-              res.point,
-              res.object.otherInfo ? res.object.otherInfo : '',
-            );
+            setInfo(colord({ l: l, a: a, b: b }).toHex(), l, a, b, res.object.name, res.object.from ? res.object.from : '', res.point);
           }
         }
       }
-      function setInfo(name, l, a, b, colorName, from, point, otherInfo) {
+      function setInfo(name, l, a, b, colorName, from, point) {
         document.querySelector('#name').innerHTML = name;
         document.querySelector('#name').style.color = name;
         document.querySelector('#l').innerHTML = Number(l).toFixed(2);
@@ -605,16 +617,6 @@ export default {
         document.querySelector('#b').innerHTML = Number(b).toFixed(2);
         document.querySelector('#colorName').innerHTML = colorName;
         document.querySelector('#from').innerHTML = from;
-        let str = '';
-        let str1 = '';
-        if (otherInfo) {
-          otherInfo.forEach((item) => {
-            str += item.color + '</br>';
-            str1 += item.distance + '</br>';
-          });
-        }
-        document.querySelector('#otherInfo').innerHTML = str;
-        document.querySelector('#otherInfo2').innerHTML = str1;
         if (point) {
           document.querySelector('#x').innerHTML = point.x.toFixed(2);
           document.querySelector('#y').innerHTML = point.y.toFixed(2);
