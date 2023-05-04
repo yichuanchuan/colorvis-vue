@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-05-04 21:26:02
+ * @LastEditTime: 2023-05-04 21:31:15
 -->
 <template>
   <div class="threeDPage">
@@ -410,7 +410,7 @@ export default {
       let reg = /^(100|\d{1,2}),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
       if (!flag) {
         if (this.group.children.length > 0) this.group.clear();
-        this.thirdLevelChange(this.thirdColorValue, true);
+        // this.thirdLevelChange(this.thirdColorValue, true);
         this.firstLevelChange(this.firstColorValue, true);
         this.secondLevelChange(this.secondColorValue, true);
         // this.otherColorChange(this.otherColor, true);
@@ -492,6 +492,7 @@ export default {
           }
         });
         this.changeOther(this.otherColor, true);
+        this.thirdLevelChange(this.thirdColorValue, true);
         document.querySelector('#otherInfo').innerHTML = str;
         document.querySelector('#otherInfo2').innerHTML = str1;
         if (!flag) {
