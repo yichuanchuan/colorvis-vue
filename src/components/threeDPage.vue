@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 11:34:32
+ * @LastEditTime: 2023-05-04 15:15:41
 -->
 <template>
   <div class="threeDPage">
@@ -42,10 +42,16 @@
         <span>色值来源：</span>
         <span id="from"></span>
       </p>
-      <p>
-        <span>近似色名：</span>
-        <span id="otherInfo"></span>
-      </p>
+      <div class="other-box">
+        <p>
+          <span>近似色名</span>
+          <span id="otherInfo"></span>
+        </p>
+        <p style="margin-left: 100px">
+          <span>距离</span>
+          <span id="otherInfo2"></span>
+        </p>
+      </div>
     </div>
     <el-drawer :visible.sync="drawer" direction="rtl" custom-class="threeD" :modal="false">
       <el-input clearable v-model="colorValue" placeholder="请输入lab颜色" size="small" @change="changeColor"> </el-input>
@@ -138,6 +144,7 @@ export default {
       firstColorValue: [], // 第一层级选中的值
       secondColorValue: [], // 第二层级选中的值
       thirdColorValue: [], // 第三层级选中的值
+      allData: [],
       group: null, // 用于管理mesh对象
       status: false,
       colorValue: '',
@@ -342,6 +349,15 @@ export default {
       this.secondLevelChange(this.secondColorValue, true);
       this.thirdLevelChange(this.thirdColorValue, true);
     },
+    distanceFn(point1, point2) {
+      let dx = point2.b - point1.b;
+      let dy = point2.l - point1.l;
+      let dz = point2.a - point1.a;
+      return {
+        distance: Number(Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(3)),
+        ...point2,
+      };
+    },
     changeColor(val, flag = false) {
       if (!flag) {
         if (this.group.children.length > 0) this.group.clear();
@@ -359,20 +375,22 @@ export default {
         let position = new THREE.Vector3(x, y, z);
         // 存入每个点坐标位置
         let convexSphere = this.creatSphere(position, c);
-        convexSphere.name = '未知';
         let disteanceArr = [];
-        this.group.children.forEach((item) => {
-          if (item.name !== '' && item.name !== '未知') {
-            // 找出每个点到当前点的距离
-            disteanceArr.push({
-              name: item.name,
-              distance: Number(position.distanceTo(item.position).toFixed(4)),
-            });
-          }
+        this.allData.forEach((item) => {
+          let value = this.distanceFn(
+            {
+              b: arr[2],
+              l: arr[0],
+              a: arr[1],
+            },
+            item,
+          );
+          disteanceArr.push(value);
         });
-        disteanceArr.sort((a, b) => a.distance - b.distance); // 通过距离进行排序
+        disteanceArr.sort((a, b) => a.distance - b.distance);
         let approximationArr = disteanceArr.slice(0, 3); // 截取前三个
-        convexSphere.otherInfo = approximationArr[0].name + ', ' + approximationArr[1].name + ', ' + approximationArr[2].name;
+        convexSphere.otherInfo = approximationArr;
+        convexSphere.name = '未知';
         this.group.add(convexSphere);
         scene.add(this.group);
         if (!flag) {
@@ -400,8 +418,11 @@ export default {
             this.firstLevel = results.data;
           } else if (key == 'secondLevelList') {
             this.secondLevel = results.data;
-          } else {
+          } else if (key == 'thirdLevelList') {
             this.thirdLevel = results.data;
+          } else {
+            this.allData = results.data;
+            return;
           }
           this[key] = this.formatData(results.data);
         },
@@ -574,7 +595,16 @@ export default {
         document.querySelector('#b').innerHTML = Number(b).toFixed(2);
         document.querySelector('#colorName').innerHTML = colorName;
         document.querySelector('#from').innerHTML = from;
-        document.querySelector('#otherInfo').innerHTML = otherInfo;
+        let str = '';
+        let str1 = '';
+        if (otherInfo) {
+          otherInfo.forEach((item) => {
+            str += item.color + '</br>';
+            str1 += item.distance + '</br>';
+          });
+        }
+        document.querySelector('#otherInfo').innerHTML = str;
+        document.querySelector('#otherInfo2').innerHTML = str1;
         if (point) {
           document.querySelector('#x').innerHTML = point.x.toFixed(2);
           document.querySelector('#y').innerHTML = point.y.toFixed(2);
@@ -592,6 +622,7 @@ export default {
     this.parseCsvData('/assets/color/firstLevel.csv', 'firstLevelList');
     this.parseCsvData('/assets/color/secondLevel.csv', 'secondLevelList');
     this.parseCsvData('/assets/color/thirdLevel.csv', 'thirdLevelList');
+    this.parseCsvData('/assets/color/allData.csv', 'allData');
   },
   mounted() {
     this.initThreeD();
@@ -634,6 +665,17 @@ export default {
       font-size: 24px;
       text-shadow: 0px 0px 2px #000;
       cursor: pointer;
+    }
+  }
+  .other-box {
+    display: flex;
+    p {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      span {
+        text-align: center;
+      }
     }
   }
 }
