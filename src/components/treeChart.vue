@@ -4,11 +4,14 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:25
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 14:19:52
+ * @LastEditTime: 2023-05-04 17:19:27
 -->
 <template>
   <div class="treeCharts">
     <div id="chart" :style="{ width: '100vw', height: '700px' }"></div>
+    <div class="goBack" @click="changeGoBack" v-if="isShowOtherTree">
+      <i class="el-icon-back"></i>
+    </div>
     <img src="/assets/leftTop.png" class="leftTop-png" />
     <div class="fixed" @click="drawer = true">
       <i class="el-icon-s-operation"></i>
@@ -68,6 +71,7 @@ export default {
   name: 'threeDPage', // 层级树
   data() {
     return {
+      isShowOtherTree: false,
       drawer: false,
       colorName: '',
       symbolSize: 2,
@@ -81,8 +85,10 @@ export default {
       firstLevelList: [], // 第一层级列表
       secondLevelList: [], // 第二层级列表
       thirdLevelList: [], // 第三层级列表
+      secondLevel: [],
       listLength: 0,
       curstomDom: '', //柱状图dom
+      otherTreeData: [],
       option: {
         tooltip: {
           trigger: 'item',
@@ -122,6 +128,12 @@ export default {
     };
   },
   methods: {
+    changeGoBack() {
+      this.curstomDom.clear();
+      this.isShowOtherTree = !this.isShowOtherTree;
+      this.option.series[0].data = [this.firstLevelList];
+      this.renderBar();
+    },
     queryData() {
       this.curstomDom.dispatchAction({
         type: 'downplay',
@@ -222,11 +234,39 @@ export default {
     initOtherEvent() {
       let that = this;
       this.curstomDom.on('click', function (params) {
+        that.otherTreeData = [];
         // 先取消已高亮的节点连线
         that.curstomDom.dispatchAction({
           type: 'downplay',
           dataIndex: that.currentDataIndexs,
         });
+        let otherArr = that.secondLevel.filter((val) => {
+          return val.parent === params.name;
+        });
+        if (otherArr.length > 0 && !that.isShowOtherTree) {
+          that.isShowOtherTree = true;
+          that.otherTreeData = {
+            index: 0,
+            name: params.name,
+            children: otherArr.map((i, idx) => {
+              i.name = i.color;
+              i.index = idx + 1;
+              i.itemStyle = {
+                color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
+              };
+              i.label = {
+                color: colord({ l: i.l, a: i.a, b: i.b }).toHex(),
+              };
+              return i;
+            }),
+            label: {
+              rotate: 360,
+            },
+          };
+          that.curstomDom.clear();
+          that.option.series[0].data = [that.otherTreeData];
+          that.renderBar();
+        }
         const treeAncestors = params.treeAncestors;
         const dataIndexs = treeAncestors.map((item) => item.dataIndex);
         // 针对非最尾节点点击收缩展开后已高亮线路失效
@@ -274,7 +314,7 @@ export default {
         this.option.series = [
           {
             type: 'tree',
-            data: [this.firstLevelList],
+            data: [this.isShowOtherTree ? this.otherTreeData : this.firstLevelList],
             left: '2%',
             right: '2%',
             lineStyle: {
@@ -305,7 +345,7 @@ export default {
         this.option.series = [
           {
             type: 'tree',
-            data: [this.firstLevelList],
+            data: [this.isShowOtherTree ? this.otherTreeData : this.firstLevelList],
             left: '2%',
             right: '2%',
             lineStyle: {
@@ -351,6 +391,7 @@ export default {
     this.parseCsvData('/assets/color/firstLevel.csv', 'firstLevelList');
     this.parseCsvData('/assets/color/secondOhterLevel.csv', 'secondLevelList');
     this.parseCsvData('/assets/color/other.csv', 'thirdLevelList');
+    this.parseCsvData('/assets/color/secondLevel.csv', 'secondLevel');
   },
   mounted() {
     // 柱状图实例化
@@ -359,6 +400,12 @@ export default {
     window.addEventListener('resize', this.changeChartSize);
   },
   watch: {
+    otherTreeData: {
+      handler: function (val) {
+        console.log(val);
+      },
+      deep: true,
+    },
     listLength: function (val) {
       if (val === 3) {
         this.levelListHandel();
@@ -452,6 +499,17 @@ export default {
   }
   .el-drawer__header {
     padding: 10px 6px 0;
+  }
+}
+.goBack {
+  position: absolute;
+  left: 20px;
+  top: 120px;
+  i {
+    font-size: 24px;
+    cursor: pointer;
+    text-shadow: 0px 0px 2px #000;
+    color: #fff;
   }
 }
 </style>
