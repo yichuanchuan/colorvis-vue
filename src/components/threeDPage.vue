@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 15:17:34
+ * @LastEditTime: 2023-05-04 15:26:45
 -->
 <template>
   <div class="threeDPage">
@@ -47,7 +47,7 @@
           <span>近似色名</span>
           <span id="otherInfo"></span>
         </p>
-        <p style="margin-left: 60px">
+        <p style="margin-left: 40px">
           <span>距离</span>
           <span id="otherInfo2"></span>
         </p>
@@ -438,7 +438,7 @@ export default {
       op = Array.from(new Set(op));
       return op;
     },
-    textLoader(text, position, translateType, fontColor = 0xffffff, fontSize = 0.03) {
+    textLoader(text, position, translateType, fontColor = 0x808080, fontSize = 0.03) {
       let that = this;
       // text文本、positon（x,y,z）坐标
       this.loader.load(
@@ -489,7 +489,7 @@ export default {
       this.textGroup = new THREE.Group();
       let coordinate = ['L*', 'a*', 'b*'];
       coordinate.forEach((item) => {
-        this.textLoader(item, '', item == 'L*' ? 'y' : item == 'a*' ? 'z' : 'x', 0xffffff, 0.06);
+        this.textLoader(item, '', item == 'L*' ? 'y' : item == 'a*' ? 'z' : 'x', 0x808080, 0.06);
       });
       // 增加x、y、z刻度
       let l = ['-128', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
@@ -676,6 +676,11 @@ export default {
       span {
         text-align: center;
       }
+    }
+  }
+  p {
+    span {
+      color: #cccccc;
     }
   }
 }
