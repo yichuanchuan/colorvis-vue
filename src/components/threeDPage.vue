@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
- * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 17:58:14
+ * @LastEditors: yichuanhao 1274816963@qq.com
+ * @LastEditTime: 2023-05-04 19:05:57
 -->
 <template>
   <div class="threeDPage">
@@ -409,17 +409,38 @@ export default {
             str += item.color + '</br>';
             str1 += item.distance + '</br>';
           });
-          approximationArr.forEach((d) => {
-            const c = colord({ l: Number(d.l), a: Number(d.a), b: Number(d.b) }).toHex();
-            const y = map(Number(d.l), 0, 100, 0, 1, true);
-            const x = map(Number(d.a), -128, 127, 0, 1, true);
-            const z = map(Number(d.b), -128, 127, 0, 1, true);
-            let position = new THREE.Vector3(x, y, z);
-            // 创建球体材质
-            let convexSphere = this.creatSphere(position, c);
-            convexSphere.name = d.color;
-            convexSphere.from = d.from;
-            this.group.add(convexSphere);
+          approximationArr.forEach((item) => {
+            let colorsData = this.thirdLevel.filter((d) => d.parent === item.color);
+            let points = [];
+            colorsData.forEach((d, i) => {
+              const c = colord({ l: d.l, a: d.a, b: d.b }).toHex();
+              const y = map(d.l, 0, 100, 0, 1, true);
+              const x = map(d.b, -128, 127, 0, 1, true);
+              const z = map(d.a, -128, 127, 0, 1, true);
+              let position = new THREE.Vector3(x, y, z);
+              // 存入每个点坐标位置
+              points.push(position);
+              // 创建球体材质
+              let convexSphere = this.creatSphere(position, c);
+              convexSphere.name = d.color;
+              convexSphere.from = d.from;
+              this.group.add(convexSphere);
+            });
+            if (colorsData.length > 0) {
+              let convexGeoMesh = this.creatGeometry(points);
+              this.group.add(convexGeoMesh);
+            } else {
+              const c = colord({ l: Number(item.l), a: Number(item.a), b: Number(item.b) }).toHex();
+              const y = map(Number(item.l), 0, 100, 0, 1, true);
+              const x = map(Number(item.a), -128, 127, 0, 1, true);
+              const z = map(Number(item.b), -128, 127, 0, 1, true);
+              let position = new THREE.Vector3(x, y, z);
+              // 创建球体材质
+              let convexSphere = this.creatSphere(position, c);
+              convexSphere.name = item.color;
+              convexSphere.from = item.from;
+              this.group.add(convexSphere);
+            }
           });
         }
         document.querySelector('#otherInfo').innerHTML = str;
