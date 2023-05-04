@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-05-04 20:19:35
+ * @LastEditTime: 2023-05-04 20:24:41
 -->
 <template>
   <div class="threeDPage">
@@ -95,7 +95,7 @@
         <el-option v-for="(item, index) in thirdLevelList" :key="index" :label="item" :value="item"> </el-option>
       </el-select>
       <!-- 其他颜色 -->
-      <el-select v-model="otherColor" placeholder="相似色名" size="small" multiple filterable clearable>
+      <el-select v-model="otherColor" placeholder="相似色名" size="small" multiple filterable clearable @change="otherColorChange">
         <el-option v-for="(item, index) in allData" :key="index" :label="item.color" :value="item.color"> </el-option>
       </el-select>
       <!-- 是否以线框展示 -->
@@ -363,6 +363,7 @@ export default {
         ...point2,
       };
     },
+    otherColorChange() {},
     changeColor(val, flag = false) {
       if (!flag) {
         if (this.group.children.length > 0) this.group.clear();
