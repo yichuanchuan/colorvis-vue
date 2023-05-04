@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-05-04 19:05:57
+ * @LastEditTime: 2023-05-04 20:19:35
 -->
 <template>
   <div class="threeDPage">
@@ -432,8 +432,8 @@ export default {
             } else {
               const c = colord({ l: Number(item.l), a: Number(item.a), b: Number(item.b) }).toHex();
               const y = map(Number(item.l), 0, 100, 0, 1, true);
-              const x = map(Number(item.a), -128, 127, 0, 1, true);
-              const z = map(Number(item.b), -128, 127, 0, 1, true);
+              const x = map(Number(item.b), -128, 127, 0, 1, true);
+              const z = map(Number(item.a), -128, 127, 0, 1, true);
               let position = new THREE.Vector3(x, y, z);
               // 创建球体材质
               let convexSphere = this.creatSphere(position, c);
