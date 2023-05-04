@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-05-04 21:24:53
+ * @LastEditTime: 2023-05-04 21:26:02
 -->
 <template>
   <div class="threeDPage">
@@ -468,6 +468,7 @@ export default {
           );
           disteanceArr.push(value);
         });
+        this.otherColor = [];
         disteanceArr.sort((a, b) => a.distance - b.distance);
         this.approximationArr = disteanceArr.slice(0, 3); // 截取前三个
         convexSphere.otherInfo = this.approximationArr;
