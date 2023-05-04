@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-04-26 10:26:24
+ * @LastEditTime: 2023-05-04 11:34:32
 -->
 <template>
   <div class="threeDPage">
@@ -44,7 +44,7 @@
       </p>
       <p>
         <span>近似色名：</span>
-        <span id="from"></span>
+        <span id="otherInfo"></span>
       </p>
     </div>
     <el-drawer :visible.sync="drawer" direction="rtl" custom-class="threeD" :modal="false">
@@ -360,6 +360,19 @@ export default {
         // 存入每个点坐标位置
         let convexSphere = this.creatSphere(position, c);
         convexSphere.name = '未知';
+        let disteanceArr = [];
+        this.group.children.forEach((item) => {
+          if (item.name !== '' && item.name !== '未知') {
+            // 找出每个点到当前点的距离
+            disteanceArr.push({
+              name: item.name,
+              distance: Number(position.distanceTo(item.position).toFixed(4)),
+            });
+          }
+        });
+        disteanceArr.sort((a, b) => a.distance - b.distance); // 通过距离进行排序
+        let approximationArr = disteanceArr.slice(0, 3); // 截取前三个
+        convexSphere.otherInfo = approximationArr[0].name + ', ' + approximationArr[1].name + ', ' + approximationArr[2].name;
         this.group.add(convexSphere);
         scene.add(this.group);
         if (!flag) {
@@ -518,7 +531,7 @@ export default {
       canvas.addEventListener('pointermove', onPointerMove);
       let that = this;
       function onPointerMove(event) {
-        setInfo('', 0, 0, 0, '', '');
+        setInfo('', 0, 0, 0, '', '', '', '');
         if (!that.group) return;
         if (selectedObject) {
           selectedObject.scale.set(0.01, 0.01, 0.01);
@@ -540,11 +553,20 @@ export default {
             let l = map(res.point.y, 0, 1, 0, 100, true);
             let b = map(res.point.x, 0, 1, -128, 127, true);
             let a = map(res.point.z, 0, 1, -128, 127, true);
-            setInfo(colord({ l: l, a: a, b: b }).toHex(), l, a, b, res.object.name, res.object.from ? res.object.from : '', res.point);
+            setInfo(
+              colord({ l: l, a: a, b: b }).toHex(),
+              l,
+              a,
+              b,
+              res.object.name,
+              res.object.from ? res.object.from : '',
+              res.point,
+              res.object.otherInfo ? res.object.otherInfo : '',
+            );
           }
         }
       }
-      function setInfo(name, l, a, b, colorName, from, point) {
+      function setInfo(name, l, a, b, colorName, from, point, otherInfo) {
         document.querySelector('#name').innerHTML = name;
         document.querySelector('#name').style.color = name;
         document.querySelector('#l').innerHTML = Number(l).toFixed(2);
@@ -552,6 +574,7 @@ export default {
         document.querySelector('#b').innerHTML = Number(b).toFixed(2);
         document.querySelector('#colorName').innerHTML = colorName;
         document.querySelector('#from').innerHTML = from;
+        document.querySelector('#otherInfo').innerHTML = otherInfo;
         if (point) {
           document.querySelector('#x').innerHTML = point.x.toFixed(2);
           document.querySelector('#y').innerHTML = point.y.toFixed(2);
