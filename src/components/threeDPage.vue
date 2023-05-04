@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao 1274816963@qq.com
- * @LastEditTime: 2023-05-04 20:24:41
+ * @LastEditTime: 2023-05-04 21:24:53
 -->
 <template>
   <div class="threeDPage">
@@ -95,8 +95,8 @@
         <el-option v-for="(item, index) in thirdLevelList" :key="index" :label="item" :value="item"> </el-option>
       </el-select>
       <!-- 其他颜色 -->
-      <el-select v-model="otherColor" placeholder="相似色名" size="small" multiple filterable clearable @change="otherColorChange">
-        <el-option v-for="(item, index) in allData" :key="index" :label="item.color" :value="item.color"> </el-option>
+      <el-select v-model="otherColor" placeholder="相似色名" size="small" multiple filterable clearable @change="otherColorChange" value-key="color">
+        <el-option v-for="(item, index) in allData" :key="index" :label="item.color" :value="item"> </el-option>
       </el-select>
       <!-- 是否以线框展示 -->
       <div class="switch">
@@ -158,6 +158,7 @@ export default {
       secondLevel: [],
       thirdLevel: [],
       otherColor: [],
+      approximationArr: [],
     };
   },
   methods: {
@@ -168,6 +169,7 @@ export default {
         this.secondLevelChange(this.secondColorValue, true);
         this.thirdLevelChange(this.thirdColorValue, true);
         this.changeColor(this.colorValue, true);
+        this.otherColorChange(this.otherColor, true);
       }
       val.forEach((item) => {
         let colorsData = this.firstLevel.filter((d) => d.parent === item);
@@ -195,6 +197,7 @@ export default {
         this.thirdLevelChange(this.thirdColorValue, true);
         this.firstLevelChange(this.firstColorValue, true);
         this.changeColor(this.colorValue, true);
+        this.otherColorChange(this.otherColor, true);
       }
       val.forEach((item) => {
         let colorsData = this.secondLevel.filter((d) => d.parent === item);
@@ -224,6 +227,7 @@ export default {
         this.secondLevelChange(this.secondColorValue, true);
         this.firstLevelChange(this.firstColorValue, true);
         this.changeColor(this.colorValue, true);
+        this.otherColorChange(this.otherColor, true);
       }
       val.forEach((item) => {
         let colorsData = this.thirdLevel.filter((d) => d.parent === item);
@@ -353,6 +357,8 @@ export default {
       this.firstLevelChange(this.firstColorValue, true);
       this.secondLevelChange(this.secondColorValue, true);
       this.thirdLevelChange(this.thirdColorValue, true);
+      this.changeColor(this.colorValue, true);
+      this.otherColorChange(this.otherColor, true);
     },
     distanceFn(point1, point2) {
       let dx = point2.b - point1.b;
@@ -363,18 +369,84 @@ export default {
         ...point2,
       };
     },
-    otherColorChange() {},
-    changeColor(val, flag = false) {
+    otherColorChange(val, flag = false) {
       if (!flag) {
         if (this.group.children.length > 0) this.group.clear();
         this.thirdLevelChange(this.thirdColorValue, true);
         this.firstLevelChange(this.firstColorValue, true);
         this.secondLevelChange(this.secondColorValue, true);
+        this.changeColor(this.colorValue, true);
       }
+      val.forEach((d) => {
+        const c = colord({ l: d.l, a: d.a, b: d.b }).toHex();
+        const y = map(d.l, 0, 100, 0, 1, true);
+        const x = map(d.b, -128, 127, 0, 1, true);
+        const z = map(d.a, -128, 127, 0, 1, true);
+        let position = new THREE.Vector3(x, y, z);
+        // 创建球体材质
+        let convexSphere = this.creatSphere(position, c);
+        convexSphere.name = d.color;
+        convexSphere.from = d.from;
+        this.group.add(convexSphere);
+      });
+      scene.add(this.group);
+    },
+    changeOther() {
+      this.otherColor.forEach((d) => {
+        const c = colord({ l: d.l, a: d.a, b: d.b }).toHex();
+        const y = map(d.l, 0, 100, 0, 1, true);
+        const x = map(d.b, -128, 127, 0, 1, true);
+        const z = map(d.a, -128, 127, 0, 1, true);
+        let position = new THREE.Vector3(x, y, z);
+        // 创建球体材质
+        let convexSphere = this.creatSphere(position, c);
+        convexSphere.name = d.color;
+        convexSphere.from = d.from;
+        this.group.add(convexSphere);
+      });
+      scene.add(this.group);
+    },
+    changeColor(val, flag = false) {
+      let reg = /^(100|\d{1,2}),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
+      if (!flag) {
+        if (this.group.children.length > 0) this.group.clear();
+        this.thirdLevelChange(this.thirdColorValue, true);
+        this.firstLevelChange(this.firstColorValue, true);
+        this.secondLevelChange(this.secondColorValue, true);
+        // this.otherColorChange(this.otherColor, true);
+      }
+      if (flag && reg.test(val)) {
+        let arr = val.split(',');
+        const c = colord({ l: arr[0], a: arr[1], b: arr[2] }).toHex();
+        const y = map(arr[0], 0, 100, 0, 1, true); // l
+        const z = map(arr[1], -128, 127, 0, 1, true); // a
+        const x = map(arr[2], -128, 127, 0, 1, true); // b
+        let position = new THREE.Vector3(x, y, z);
+        // 存入每个点坐标位置
+        let convexSphere = this.creatSphere(position, c);
+        let disteanceArr = [];
+        this.allData.forEach((item) => {
+          let value = this.distanceFn(
+            {
+              b: arr[2],
+              l: arr[0],
+              a: arr[1],
+            },
+            item,
+          );
+          disteanceArr.push(value);
+        });
+        disteanceArr.sort((a, b) => a.distance - b.distance);
+        this.approximationArr = disteanceArr.slice(0, 3); // 截取前三个
+        convexSphere.otherInfo = this.approximationArr;
+        convexSphere.name = '未知';
+        this.group.add(convexSphere);
+        scene.add(this.group);
+        return;
+      }
+      this.approximationArr = [];
       document.querySelector('#otherInfo').innerHTML = '';
       document.querySelector('#otherInfo2').innerHTML = '';
-      this.otherColor = [];
-      let reg = /^(100|\d{1,2}),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?)),(0|-?(12[0-8]|1[01][0-9]|[1-9][0-9]?))$/;
       if (reg.test(val)) {
         let arr = val.split(',');
         const c = colord({ l: arr[0], a: arr[1], b: arr[2] }).toHex();
@@ -397,53 +469,28 @@ export default {
           disteanceArr.push(value);
         });
         disteanceArr.sort((a, b) => a.distance - b.distance);
-        let approximationArr = disteanceArr.slice(0, 3); // 截取前三个
-        convexSphere.otherInfo = approximationArr;
+        this.approximationArr = disteanceArr.slice(0, 3); // 截取前三个
+        convexSphere.otherInfo = this.approximationArr;
         convexSphere.name = '未知';
         this.group.add(convexSphere);
         scene.add(this.group);
         let str = '';
         let str1 = '';
-        if (otherInfo) {
-          approximationArr.forEach((item) => {
-            this.otherColor.push(item.color);
-            str += item.color + '</br>';
-            str1 += item.distance + '</br>';
-          });
-          approximationArr.forEach((item) => {
-            let colorsData = this.thirdLevel.filter((d) => d.parent === item.color);
-            let points = [];
-            colorsData.forEach((d, i) => {
-              const c = colord({ l: d.l, a: d.a, b: d.b }).toHex();
-              const y = map(d.l, 0, 100, 0, 1, true);
-              const x = map(d.b, -128, 127, 0, 1, true);
-              const z = map(d.a, -128, 127, 0, 1, true);
-              let position = new THREE.Vector3(x, y, z);
-              // 存入每个点坐标位置
-              points.push(position);
-              // 创建球体材质
-              let convexSphere = this.creatSphere(position, c);
-              convexSphere.name = d.color;
-              convexSphere.from = d.from;
-              this.group.add(convexSphere);
-            });
-            if (colorsData.length > 0) {
-              let convexGeoMesh = this.creatGeometry(points);
-              this.group.add(convexGeoMesh);
-            } else {
-              const c = colord({ l: Number(item.l), a: Number(item.a), b: Number(item.b) }).toHex();
-              const y = map(Number(item.l), 0, 100, 0, 1, true);
-              const x = map(Number(item.b), -128, 127, 0, 1, true);
-              const z = map(Number(item.a), -128, 127, 0, 1, true);
-              let position = new THREE.Vector3(x, y, z);
-              // 创建球体材质
-              let convexSphere = this.creatSphere(position, c);
-              convexSphere.name = item.color;
-              convexSphere.from = item.from;
-              this.group.add(convexSphere);
+        this.approximationArr.forEach((item) => {
+          str += item.color + '</br>';
+          str1 += item.distance + '</br>';
+        });
+        this.approximationArr.forEach((item) => {
+          let colorsData = this.thirdLevel.filter((d) => d.parent === item.color);
+          if (colorsData.length > 0) {
+            if (this.thirdColorValue.indexOf(item.color) == -1) {
+              this.thirdColorValue.push(item.color);
             }
-          });
-        }
+          } else {
+            this.otherColor.push(item);
+          }
+        });
+        this.changeOther(this.otherColor, true);
         document.querySelector('#otherInfo').innerHTML = str;
         document.querySelector('#otherInfo2').innerHTML = str1;
         if (!flag) {
