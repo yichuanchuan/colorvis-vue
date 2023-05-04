@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 15:15:41
+ * @LastEditTime: 2023-05-04 15:17:34
 -->
 <template>
   <div class="threeDPage">
@@ -47,7 +47,7 @@
           <span>近似色名</span>
           <span id="otherInfo"></span>
         </p>
-        <p style="margin-left: 100px">
+        <p style="margin-left: 60px">
           <span>距离</span>
           <span id="otherInfo2"></span>
         </p>
