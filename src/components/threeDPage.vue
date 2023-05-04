@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 15:26:45
+ * @LastEditTime: 2023-05-04 15:38:13
 -->
 <template>
   <div class="threeDPage">
@@ -14,42 +14,42 @@
     <div class="info" id="info">
       <p class="title-top">
         <span>HEX：</span>
-        <span id="name"></span>
+        <span id="name" class="c"></span>
       </p>
       <p>
-        <span>l：</span>
-        <span id="l"></span>
+        <span class="t">l：</span>
+        <span id="l" class="c"></span>
         <span style="margin-left: 10px">x：</span>
-        <span id="x"></span>
+        <span id="x" class="c"></span>
       </p>
       <p>
-        <span>a：</span>
-        <span id="a"></span>
+        <span class="t">a：</span>
+        <span id="a" class="c"></span>
         <span style="margin-left: 10px">y：</span>
-        <span id="y"></span>
+        <span id="y" class="c"></span>
       </p>
       <p>
-        <span>b：</span>
-        <span id="b"></span>
+        <span class="t">b：</span>
+        <span id="b" class="c"></span>
         <span style="margin-left: 10px">z：</span>
-        <span id="z"></span>
+        <span id="z" class="c"></span>
       </p>
       <p>
         <span>颜色名称：</span>
-        <span id="colorName"></span>
+        <span id="colorName" class="c"></span>
       </p>
       <p>
         <span>色值来源：</span>
-        <span id="from"></span>
+        <span id="from" class="c"></span>
       </p>
       <div class="other-box">
         <p>
           <span>近似色名</span>
-          <span id="otherInfo"></span>
+          <span id="otherInfo" class="c"></span>
         </p>
         <p style="margin-left: 40px">
           <span>距离</span>
-          <span id="otherInfo2"></span>
+          <span id="otherInfo2" class="c"></span>
         </p>
       </div>
     </div>
@@ -669,6 +669,7 @@ export default {
   }
   .other-box {
     display: flex;
+    align-content: flex-start;
     p {
       display: flex;
       flex-direction: column;
@@ -679,8 +680,18 @@ export default {
     }
   }
   p {
-    span {
+    .c {
       color: #cccccc;
+    }
+    .t {
+      display: inline-block;
+      width: 20px;
+    }
+    #l,
+    #a,
+    #b {
+      display: inline-block;
+      width: 50px;
     }
   }
 }
