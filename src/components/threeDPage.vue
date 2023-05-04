@@ -4,7 +4,7 @@
  * @Author: yichuanhao
  * @Date: 2023-04-23 11:49:04
  * @LastEditors: yichuanhao
- * @LastEditTime: 2023-05-04 15:38:13
+ * @LastEditTime: 2023-05-04 17:27:34
 -->
 <template>
   <div class="threeDPage">
@@ -393,6 +393,16 @@ export default {
         convexSphere.name = '未知';
         this.group.add(convexSphere);
         scene.add(this.group);
+        let str = '';
+        let str1 = '';
+        if (otherInfo) {
+          approximationArr.forEach((item) => {
+            str += item.color + '</br>';
+            str1 += item.distance + '</br>';
+          });
+        }
+        document.querySelector('#otherInfo').innerHTML = str;
+        document.querySelector('#otherInfo2').innerHTML = str1;
         if (!flag) {
           this.$message({
             showClose: true,
